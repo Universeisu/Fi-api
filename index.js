@@ -30,11 +30,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // ใช้ router
-app.use("/api/v1/devices/", storeRouter); // เปลี่ยน URL ให้ตรงกับการจัดการรายวิชา
+app.use("/api/v1/stores/", storeRouter); // เปลี่ยน URL ให้ตรงกับการจัดการรายวิชา
 app.use("/api/v1/auth", authRouter);
 
 app.get("/", (req, res) => {
-  res.send("<h1>Hello Course Management API</h1>"); // เปลี่ยนข้อความให้ตรงกับระบบ
+  res.send("<h1>Hello Store Management API</h1>"); // เปลี่ยนข้อความให้ตรงกับระบบ
 });
 
 app.listen(PORT, () => {

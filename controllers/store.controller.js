@@ -2,10 +2,24 @@ const Store = require("../models/store.model");
 
 // Create and Save a New device
 exports.create = async (req, res) => {
-  const { storeId, storeName, address, latitude, longitude, deliveryRadius } =
-    req.body;
+  const {
+    storeId,
+    storeName,
+    address,
+    latitude,
+    longitude,
+    deliveryRadius,
+    adminId,
+  } = req.body;
 
-  if (!storeName || !address || !latitude || !longitude || !deliveryRadius) {
+  if (
+    !storeName ||
+    !address ||
+    !latitude ||
+    !longitude ||
+    !deliveryRadius ||
+    !adminId
+  ) {
     res.status(400).send({
       message:
         "Store Name, Address, Latitude, Longitude, and Delivery Radius cannot be empty!",
@@ -46,7 +60,7 @@ exports.create = async (req, res) => {
 
 // Get all courses
 exports.getAll = async (req, res) => {
-  await  Store.findAll()
+  await Store.findAll()
     .then((data) => {
       res.send(data);
     })
