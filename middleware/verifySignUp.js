@@ -2,12 +2,12 @@ const User = require("../models/user.model");
 const Role = require("../models/role.model");
 const { Op } = require("sequelize");
 
-checkDuplicateUsernameOrEmail = async (req, res, next) => {
+checkDuplicateUsernameOraddress = async (req, res, next) => {
   try {
     // Check username
     const user = await User.findOne({
       where: {
-        username: req.body.username,
+        userName: req.body.userName, // ตรวจสอบ userName แทน username
       },
     });
     
@@ -16,13 +16,13 @@ checkDuplicateUsernameOrEmail = async (req, res, next) => {
     }
 
     // Check email
-    const email = await User.findOne({
+    const address = await User.findOne({
       where: {
-        email: req.body.email,
+        address: req.body.address,
       },
     });
 
-    if (email) {
+    if (address) {
       return res.status(400).send({ message: "Failed! Email is already in use!" });
     }
 
@@ -32,17 +32,22 @@ checkDuplicateUsernameOrEmail = async (req, res, next) => {
   }
 };
 
+
 // Check roles are valid
 checkRolesExisted = async (req, res, next) => {
-  if (req.body.roles) {
+  const roles = req.body.roles || []; // กำหนดค่าเป็นอาร์เรย์ว่างถ้าไม่มี roles
+
+  console.log("Roles from request body:", roles); // เพิ่มการล็อกเพื่อดูค่าที่ได้รับ
+
+  if (Array.isArray(roles) && roles.length > 0) {
     try {
-      const roles = await Role.findAll({
+      const foundRoles = await Role.findAll({
         where: {
-          name: { [Op.or]: req.body.roles },
+          name: { [Op.or]: roles },
         },
       });
 
-      if (roles.length !== req.body.roles.length) {
+      if (foundRoles.length !== roles.length) {
         return res.status(400).send({ message: "Failed! Role does not exist!" });
       }
 
@@ -51,12 +56,15 @@ checkRolesExisted = async (req, res, next) => {
       return res.status(500).send({ message: error.message });
     }
   } else {
-    next();
+    // จัดการกรณีที่ roles ไม่ใช่อาร์เรย์หรือว่างเปล่า
+    return res.status(400).send({ message: "Failed! Roles must be a non-empty array!" });
   }
 };
 
+
+
 const verifySignUp = {
-  checkDuplicateUsernameOrEmail,
+  checkDuplicateUsernameOraddress,
   checkRolesExisted,
 };
 

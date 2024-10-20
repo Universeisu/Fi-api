@@ -1,8 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("./db");
 
-// Define Role schema
-const User = sequelize.define("SUser", {
+const User = sequelize.define("SUsers", {
   userId: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -20,14 +19,14 @@ const User = sequelize.define("SUser", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  latitude: {
-    type: DataTypes.FLOAT, // เก็บตัวเลขแบบทศนิยม
-    allowNull: false, // ไม่อนุญาตให้ค่านี้เป็นค่าว่าง
+  role: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
-  longitude: {
-    type: DataTypes.FLOAT, // เก็บตัวเลขแบบทศนิยม
-    allowNull: false, // อนุญาตให้ค่านี้เป็นค่าว่างได้
-  },
+
+}, {
+  freezeTableName: true // ทำให้ใช้ชื่อ 'SUser' ตามที่คุณตั้งไว้ และไม่เปลี่ยนเป็นรูปพหูพจน์
 });
+
 
 module.exports = User;

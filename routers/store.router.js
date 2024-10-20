@@ -4,7 +4,7 @@ const storeController = require("../controllers/store.controller");
 const authJwt = require("../middleware/authJwt");
 
 // Create a device
-// POST http://localhost:5000/api/v1/devices/
+// POST /http://localhost:5000/api/v1/devices
 router.post("/", storeController.create);
 
 // Get all device

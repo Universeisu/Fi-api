@@ -9,53 +9,48 @@ const { Op } = require("sequelize");
 // Register a new user
 exports.signup = async (req, res) => {
   try {
-    const { username, email, password, roles } = req.body;
+    const { userName, address, password, roles } = req.body;
 
-    if (!username || !email || !password) {
+    if (!userName || !address || !password) {
       return res.status(400).send({ message: "Please provide all required fields!" });
     }
 
-    // Prepare user data
     const hashedPassword = bcrypt.hashSync(password, 8);
-    const newUser = { username, email, password: hashedPassword };
+    
+    // ตั้งค่า role เป็นค่าเริ่มต้นถ้าไม่มีการส่งมาจาก client
+    const userRole = roles && roles.length > 0 ? roles : ["user"];
 
-    // Save user in the database
+    const newUser = {
+      userName,
+      address,
+      password: hashedPassword,
+      role: userRole[0] // หรือตั้งค่าเป็นค่าเริ่มต้น
+    };
+
     const user = await User.create(newUser);
-
-    if (roles) {
-      const rolesData = await Role.findAll({
-        where: { name: { [Op.or]: roles } }
-      });
-
-      // Check if roles exist
-      if (rolesData.length === 0) {
-        return res.status(400).send({ message: "Failed! Roles are not valid!" });
-      }
-
-      await user.setRoles(rolesData);
-    } else {
-      // Set default role to "user" (id = 1)
-      await user.setRoles([1]);
-    }
+    
+    // ... rest of your code for setting roles
 
     res.send({ message: "User registered successfully!" });
-
   } catch (error) {
     res.status(500).send({ message: error.message || "Something went wrong while registering the user." });
   }
 };
 
+
+
 // Sign in
 exports.signin = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { userName, password } = req.body;
 
-    if (!username || !password) {
+    // Check for required fields
+    if (!userName || !password) {
       return res.status(400).send({ message: "Please provide all required fields!" });
     }
 
-    // Find user by username
-    const user = await User.findOne({ where: { username } });
+    // Find user by userName
+    const user = await User.findOne({ where: { userName } });
 
     if (!user) {
       return res.status(404).send({ message: "User not found." });
@@ -71,7 +66,7 @@ exports.signin = async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 }); // 24 hours
+    const token = jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 });
 
     // Get user roles
     const roles = await user.getRoles();
@@ -79,8 +74,8 @@ exports.signin = async (req, res) => {
 
     res.status(200).send({
       id: user.id,
-      username: user.username,
-      email: user.email,
+      userName: user.userName,
+      address: user.address,
       roles: authorities,
       accessToken: token,
     });
@@ -89,3 +84,4 @@ exports.signin = async (req, res) => {
     res.status(500).send({ message: error.message || "Something went wrong while signing in." });
   }
 };
+

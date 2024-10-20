@@ -15,7 +15,7 @@ router.use((req, res, next) => {
 // Route สำหรับการสมัครสมาชิก
 router.post("/signup", 
   [
-  verifySignUp.checkDuplicateUsernameOrEmail, 
+  verifySignUp.checkDuplicateUsernameOraddress, 
   verifySignUp.checkRolesExisted, 
   ],
   authController.signup
